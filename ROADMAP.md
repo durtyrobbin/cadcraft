@@ -141,3 +141,8 @@ Ranked; detail and the full beta checklist in [docs/roadmap.md](docs/roadmap.md)
 ## Shared UI workspace integration
 
 Tool Sets, Layers and Properties use shared docking with persisted layouts, keyboard focus and compact toolbar overflow. No milestone percentage change.
+
+Local ArtCraft Launcher integration (2026-10-11): `cadcraft-io` now offers a
+default-enabled `dwg` feature. Embedded hosts can disable it for DXF-only native
+drawing persistence without linking the DWG converter. Standalone defaults are
+unchanged; no parity or readiness percentage change.

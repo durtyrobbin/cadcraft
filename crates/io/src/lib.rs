@@ -56,6 +56,7 @@ fn ext(name: &str) -> String {
 
 /// Read a drawing; the format comes from the content (DXF ASCII/binary) or the name.
 pub fn read(bytes: &[u8], name: &str) -> Result<Drawing> {
+    #[cfg(feature = "dwg")]
     if cadcraft_dwg::is_dwg(bytes) {
         let dxf = cadcraft_dwg::dwg_to_dxf(bytes).map_err(IoError::Format)?;
         return dxf_read::read(&dxf).map_err(|e| IoError::Format(format!("{e} (in the DXF converted from this DWG)")));
@@ -90,10 +91,13 @@ pub fn write_with(d: &Drawing, name: &str, opts: &SaveOptions) -> Result<Vec<u8>
         // The DWG bridge reads our R2000 DXF and writes the DWG at the version asked for. Without
         // one, at least 2004: R2000 DWG has no true colours, transparency, table styles or
         // gradients, so a drawing from an R2000 DXF doesn't lose them by default.
+        #[cfg(feature = "dwg")]
         "dwg" if !opts.binary => {
             let version = opts.version.unwrap_or_else(|| version.max(Version::R2004));
             cadcraft_dwg::dxf_to_dwg_as(dxf_write::write(d).as_bytes(), version.code()).map_err(IoError::Format)
         }
+        #[cfg(not(feature = "dwg"))]
+        "dwg" => Err(IoError::Unsupported("DWG support is not enabled in this build".into())),
         e if opts.binary => Err(IoError::Format(format!("binary output is for DXF files, not `{e}`"))),
         _ => write_framed(d, name, None),
     }
